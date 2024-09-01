@@ -1,0 +1,56 @@
+<style>
+    .create-teacher-container{
+        width:400px;
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+    }
+</style>
+
+<div class="create-teacher-container">
+    <h2>Create Teacher</h2>
+    <form id="createTeacherForm">
+        <input type="text" id="teacherNIC" placeholder="NIC Number" required>
+        <input type="text" id="teacherFirstName" placeholder="First Name" required>
+        <input type="text" id="teacherLastName" placeholder="Last Name" required>
+        <input type="date" id="teacherDateOfBirth" placeholder="Date Of Birth" required>
+        <input type="text" id="teacherUsername" placeholder="Username" required>
+        <input type="password" id="teacherPassword" placeholder="Password" required>
+        <button type="submit">Create Teacher</button>
+    </form>
+    <div id="create-teacher-message"></div>
+</div>
+
+<script>
+    console.log('testing 123')
+
+    document.getElementById('createTeacherForm').addEventListener('submit', function (e) {
+        e.preventDefault();  // Prevent the form from refreshing the page
+
+        const teacherNIC = document.getElementById('teacherNIC').value;
+        const teacherFirstName = document.getElementById('teacherFirstName').value;
+        const teacherLastName = document.getElementById('teacherLastName').value;
+        const teacherUsername = document.getElementById('teacherUsername').value;
+        const teacherPassword = document.getElementById('teacherPassword').value;
+
+        const newTeacher = {
+            nic: teacherNIC,
+            firstName: teacherFirstName,
+            lastName: teacherLastName,
+            username: teacherUsername,
+            password: teacherPassword,
+            role: "Teacher"
+        };
+
+        let teachers = JSON.parse(localStorage.getItem('teachers')) || [];
+        teachers.push(newTeacher);
+        localStorage.setItem('teachers', JSON.stringify(teachers));
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users.push({ username: teacherUsername, password: teacherPassword, role: "Teacher" });
+        localStorage.setItem('users', JSON.stringify(users));
+
+        document.getElementById('createTeacherForm').reset();  // Reset the form fields
+        document.getElementById('create-teacher-message').textContent = "Teacher created successfully!";
+    });
+</script>

@@ -1,0 +1,65 @@
+<style>
+    #teachersTableContainer {
+        width: 700px;
+        background-color: white;
+        border-radius: 20px;
+    }
+
+    #teachersTableContainer #teachersTable{
+        margin: 20px;
+    }
+</style>
+
+
+<div id="teachersTableContainer">
+    <h2>Teachers List</h2>
+    <table id="teachersTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>NIC Number</th>
+                <th>Assigned Class</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Teacher rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    (function () {
+        let teachers = JSON.parse(localStorage.getItem('teachers')) || [];
+
+        function displayTeachers() {
+            const teachersTableBody = document.querySelector("#teachersTable tbody");
+            teachersTableBody.innerHTML = ''; // Clear existing rows
+
+            teachers.forEach((teacher) => {
+                const row = document.createElement('tr');
+
+                const firstNameCell = document.createElement('td');
+                firstNameCell.textContent = teacher.firstName;
+                row.appendChild(firstNameCell);
+
+                const lastNameCell = document.createElement('td');
+                lastNameCell.textContent = teacher.lastName;
+                row.appendChild(lastNameCell);
+
+                const nicCell = document.createElement('td');
+                nicCell.textContent = teacher.nic;
+                row.appendChild(nicCell);
+
+                const assignedClassCell = document.createElement('td');
+                assignedClassCell.textContent = teacher.assignedClass || 'Not Assigned';
+                row.appendChild(assignedClassCell);
+
+                teachersTableBody.appendChild(row);
+            });
+        }
+
+        // Call the function to display teachers
+        displayTeachers();
+    })();
+</script>

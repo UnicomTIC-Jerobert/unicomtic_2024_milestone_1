@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+       
+        /* Sidebar Styles */
+        #sidebar {
+            width: 15vw;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        #profileContainer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #profilePicture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        #usernameDisplay {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #menuContainer {
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+
+        #menuContainer button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        #menuContainer button:hover {
+            background-color: #1abc9c;
+        }
+
+        #logoutContainer {
+            text-align: center;
+        }
+
+        #logoutButton {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #logoutButton:hover {
+            background-color: #c0392b;
+        }
+
+        .contentContainer {
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            width: 85vw;
+            background-color: yellow;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <!-- Profile Section -->
+        <div id="profileContainer">
+            <img id="profilePicture" src="./default-profile.png" alt="Profile Picture">
+            <p id="usernameDisplay">Username</p>
+        </div>
+
+        <!-- Menu Container -->
+        <div id="menuContainer"></div>
+
+        <!-- Logout Button at the Bottom -->
+        <div id="logoutContainer">
+            <button id="logoutButton">Logout</button>
+        </div>
+    </div>
+    <div id="content" class="contentContainer"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+            if (!loggedInUser) {
+                alert("No user logged in");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const profilePicture = document.getElementById("profilePicture");
+            const usernameDisplay = document.getElementById("usernameDisplay");
+            const menuContainer = document.getElementById("menuContainer");
+            const logoutButton = document.getElementById("logoutButton");
+
+            profilePicture.src = loggedInUser.profilePicture || "./default-profile.png";
+            usernameDisplay.textContent = loggedInUser.username;
+
+            const menus = {
+                Admin: [
+                    { name: "Create Classes", page: "create-classes.html" },
+                    { name: "Create Teacher", page: "create-teacher.html" },
+                    { name: "View Teachers", page: "view-teachers.html" },
+                    { name: "View Students", page: "view-students.html" }
+                ],
+                Teacher: [
+                    { name: "View Class", page: "view-class.html" },
+                    { name: "Enter Marks", page: "enter-marks.html" }
+                ],
+                Student: [
+                    { name: "View Marks", page: "view-marks.html" },
+                    { name: "Choose Subjects", page: "choose-subjects.html" }
+                ]
+            };
+
+            const userMenus = menus[loggedInUser.role] || [];
+
+            userMenus.forEach(menu => {
+                const button = document.createElement("button");
+                button.textContent = menu.name;
+                button.addEventListener("click", function () {
+                    navigateTo(menu.page, menu.name);
+                });
+                menuContainer.appendChild(button);
+            });
+
+            logoutButton.addEventListener("click", function () {
+                localStorage.removeItem("loggedInUser");
+                window.location.href = "login.html";
+            });
+
+            window.addEventListener("hashchange", function () {
+                const hash = window.location.hash.substring(1);
+                const matchedMenu = userMenus.find(menu => menu.page === hash);
+                if (matchedMenu) {
+                    loadPage(hash);
+                }
+            });
+
+            function navigateTo(page, title) {
+                window.location.hash = page;
+                loadPage(page);
+                document.title = title;
+            }
+
+            function loadPage(page) {
+                fetch(`./pages/${page}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const content = document.getElementById("content");
+                        content.innerHTML = html;
+                        initializePage();
+                    })
+                    .catch(err => document.getElementById("content").innerHTML = "<p>Page not found.</p>");
+            }
+
+            function initializePage() {
+                const scripts = document.querySelectorAll("#content script");
+                scripts.forEach(script => {
+                    const newScript = document.createElement("script");
+                    newScript.textContent = script.textContent;
+                    document.body.appendChild(newScript);
+                    document.body.removeChild(newScript);
+                });
+            }
+
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash) {
+                loadPage(currentHash);
+            } else if (userMenus.length > 0) {
+                navigateTo(userMenus[0].page, userMenus[0].name);
+            }
+        });
+
+    </script>
+</body>
+
+</html>

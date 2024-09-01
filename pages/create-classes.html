@@ -1,0 +1,133 @@
+<style>
+    .tabs {
+        width:700px;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        border-bottom: none;
+    }
+
+    .tab.active {
+        background-color: #f9f9f9;
+        font-weight: bold;
+      
+    }
+
+    .tab-content {
+        display: none;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-top: none;
+        background-color: #f9f9f9;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .class-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .class-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .add-class {
+        background-color: #2196f3;
+    }
+</style>
+
+
+<div>
+
+    <div class="tabs">
+        <div class="tab active" data-target="grade09">Grade 09</div>
+        <div class="tab" data-target="grade10">Grade 10</div>
+        <div class="tab" data-target="grade11">Grade 11</div>
+    </div>
+
+    <div id="grade09" class="tab-content active">
+        <div class="class-grid" id="grade09-classes">hello 09</div>
+    </div>
+    <div id="grade10" class="tab-content">
+        <div class="class-grid" id="grade10-classes">hello 10</div>
+    </div>
+    <div id="grade11" class="tab-content">
+        <div class="class-grid" id="grade11-classes">hello 11</div>
+    </div>
+</div>
+
+
+<script>
+    (function () {
+        console.log('test classes')
+
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".tab-content");
+
+        // Tab switching logic
+        tabs.forEach(tab => {
+            tab.addEventListener("click", function () {
+                tabs.forEach(t => t.classList.remove("active"));
+                contents.forEach(c => c.classList.remove("active"));
+
+                this.classList.add("active");
+                document.getElementById(this.dataset.target).classList.add("active");
+            });
+        });
+
+        // Load classes from local storage
+        function loadClasses(grade) {
+            const classes = JSON.parse(localStorage.getItem(`${grade}-classes`)) || [];
+            const classGrid = document.getElementById(`${grade}-classes`);
+            classGrid.innerHTML = "";  // Clear existing content
+
+            classes.forEach((className, index) => {
+                const classCard = document.createElement("button");
+                classCard.classList.add("class-card");
+                classCard.innerText = className;
+                classCard.addEventListener("click", () => {
+                    alert(`Class: ${className} clicked!`);
+                });
+                classGrid.appendChild(classCard);
+            });
+
+            // Add button to create new class
+            const addClassCard = document.createElement("button");
+            addClassCard.classList.add("class-card", "add-class");
+            addClassCard.innerText = "+";
+            addClassCard.addEventListener("click", () => {
+                const newClassName = prompt("Enter new class name:");
+                if (newClassName) {
+                    classes.push(newClassName);
+                    localStorage.setItem(`${grade}-classes`, JSON.stringify(classes));
+                    loadClasses(grade);  // Reload the grid
+                }
+            });
+            classGrid.appendChild(addClassCard);
+        }
+
+        // Initial load for both grades
+        loadClasses("grade09");
+        loadClasses("grade10");
+        loadClasses("grade11");
+    })();
+</script>
