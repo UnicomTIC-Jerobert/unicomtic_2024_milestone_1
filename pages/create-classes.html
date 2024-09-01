@@ -1,507 +1,508 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Grades and Classes Management</title>
-    <style>
-        /* Container for tabs and content */
+<style>
+    /* Container for tabs and content */
+    .tabs-container {
+        display: flex;
+        height: 100vh;
+        /* Full viewport height */
+        font-family: Arial, sans-serif;
+    }
+
+    /* Wrapper for tabs and add-grade button */
+    .tabs-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 250px;
+        /* Adjust as needed */
+        background-color: #f1f1f1;
+        border-right: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    /* Tabs styling */
+    .tabs {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+
+    .tab {
+        padding: 15px 20px;
+        text-align: left;
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .tab.active {
+        background-color: #ffffff;
+        font-weight: bold;
+    }
+
+    .tab:hover {
+        background-color: #e0e0e0;
+    }
+
+    /* Tab content styling */
+    .tab-contents-container {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #ffffff;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Class grid styling */
+    .class-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .class-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        background-color: #4caf50;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        position: relative;
+        transition: background-color 0.3s;
+    }
+
+    .class-card:hover {
+        background-color: #45a049;
+    }
+
+    .add-class {
+        background-color: #2196f3;
+    }
+
+    .add-class:hover {
+        background-color: #1e88e5;
+    }
+
+    /* Editable and non-editable text */
+    .editable {
+        border: 1px dashed #ccc;
+        padding: 3px 5px;
+        background-color: white;
+        cursor: text;
+        border-radius: 3px;
+    }
+
+    .editable:focus {
+        outline: none;
+        border-color: #66afe9;
+        box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+    }
+
+    .non-editable {
+        font-weight: bold;
+        cursor: default;
+    }
+
+    /* Add Grade Button */
+    .add-grade-container {
+        padding: 15px 20px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ccc;
+    }
+
+    .add-grade {
+        width: 100%;
+        padding: 10px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .add-grade:hover {
+        background-color: #1e88e5;
+    }
+
+    /* Scrollbar styling for tabs */
+    .tabs::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .tabs::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .tabs::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
         .tabs-container {
-            display: flex;
-            height: 100vh; /* Full viewport height */
-            font-family: Arial, sans-serif;
+            flex-direction: column;
         }
 
-        /* Wrapper for tabs and add-grade button */
         .tabs-wrapper {
-            display: flex;
-            flex-direction: column;
-            width: 250px; /* Adjust as needed */
-            background-color: #f1f1f1;
-            border-right: 1px solid #ccc;
-            box-sizing: border-box;
+            width: 100%;
+            flex-direction: row;
+            overflow-x: auto;
+            border-right: none;
+            border-bottom: 1px solid #ccc;
         }
 
-        /* Tabs styling */
         .tabs {
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            flex-grow: 1;
+            flex-direction: row;
         }
 
         .tab {
-            padding: 15px 20px;
-            text-align: left;
-            background-color: #f1f1f1;
-            border-bottom: 1px solid #ccc;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex: none;
+            width: auto;
+            border-bottom: none;
+            border-right: 1px solid #ccc;
         }
 
-        .tab.active {
-            background-color: #ffffff;
-            font-weight: bold;
-        }
-
-        .tab:hover {
-            background-color: #e0e0e0;
-        }
-
-        /* Tab content styling */
-        .tab-contents-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Class grid styling */
-        .class-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .class-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            background-color: #4caf50;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: background-color 0.3s;
-        }
-
-        .class-card:hover {
-            background-color: #45a049;
-        }
-
-        .add-class {
-            background-color: #2196f3;
-        }
-
-        .add-class:hover {
-            background-color: #1e88e5;
-        }
-
-        /* Editable and non-editable text */
-        .editable {
-            border: 1px dashed #ccc;
-            padding: 3px 5px;
-            background-color: white;
-            cursor: text;
-            border-radius: 3px;
-        }
-
-        .editable:focus {
-            outline: none;
-            border-color: #66afe9;
-            box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
-        }
-
-        .non-editable {
-            font-weight: bold;
-            cursor: default;
-        }
-
-        /* Add Grade Button */
         .add-grade-container {
-            padding: 15px 20px;
-            background-color: #f1f1f1;
-            border-top: 1px solid #ccc;
-        }
-
-        .add-grade {
-            width: 100%;
             padding: 10px;
-            background-color: #2196f3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
         }
+    }
+</style>
 
-        .add-grade:hover {
-            background-color: #1e88e5;
-        }
-
-        /* Scrollbar styling for tabs */
-        .tabs::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .tabs::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .tabs::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-            border-radius: 4px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .tabs-container {
-                flex-direction: column;
-            }
-            .tabs-wrapper {
-                width: 100%;
-                flex-direction: row;
-                overflow-x: auto;
-                border-right: none;
-                border-bottom: 1px solid #ccc;
-            }
-            .tabs {
-                flex-direction: row;
-            }
-            .tab {
-                flex: none;
-                width: auto;
-                border-bottom: none;
-                border-right: 1px solid #ccc;
-            }
-            .add-grade-container {
-                padding: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="tabs-container">
-        <div class="tabs-wrapper">
-            <div id="grade-tabs" class="tabs"></div>
-            <div class="add-grade-container">
-                <button id="add-grade" class="add-grade">+ Add Grade</button>
-            </div>
+<div class="tabs-container">
+    <div class="tabs-wrapper">
+        <div id="grade-tabs" class="tabs"></div>
+        <div class="add-grade-container">
+            <button id="add-grade" class="add-grade">+ Add Grade</button>
         </div>
-
-        <div id="tab-contents-container" class="tab-contents-container"></div>
     </div>
 
-    <script>
-        (function () {
-            const gradeTabsContainer = document.getElementById('grade-tabs');
-            const tabContentsContainer = document.getElementById('tab-contents-container');
-            const addGradeButton = document.getElementById('add-grade');
+    <div id="tab-contents-container" class="tab-contents-container">
 
-            /**
-             * Generates a random alphanumeric string of specified length.
-             * @param {number} length - The length of the generated ID.
-             * @returns {string} - The generated ID.
-             */
-            function generateRandomId(length = 8) {
-                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                let result = '';
-                for (let i = 0; i < length; i++) {
-                    result += characters.charAt(Math.floor(Math.random() * characters.length));
+    </div>
+</div>
+
+<script>
+    (function () {
+        const gradeTabsContainer = document.getElementById('grade-tabs');
+        const tabContentsContainer = document.getElementById('tab-contents-container');
+        const addGradeButton = document.getElementById('add-grade');
+
+        /**
+         * Generates a random alphanumeric string of specified length.
+         * @param {number} length - The length of the generated ID.
+         * @returns {string} - The generated ID.
+         */
+        function generateRandomId(length = 8) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        /**
+         * Retrieves all existing IDs (grades and classes) to ensure uniqueness.
+         * @returns {Set<string>} - A set of all existing IDs.
+         */
+        function getAllExistingIds() {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const ids = new Set();
+            grades.forEach(grade => {
+                ids.add(grade.id);
+                grade.classes.forEach(cls => ids.add(cls.id));
+            });
+            return ids;
+        }
+
+        /**
+         * Generates a unique random ID that doesn't exist in the current data.
+         * @param {number} length - The length of the ID.
+         * @returns {string} - A unique ID.
+         */
+        function generateUniqueId(length = 8) {
+            const existingIds = getAllExistingIds();
+            let id;
+            do {
+                id = generateRandomId(length);
+            } while (existingIds.has(id));
+            return id;
+        }
+
+        /**
+         * Loads grades from local storage and renders the tabs and contents.
+         */
+        function loadGrades() {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            gradeTabsContainer.innerHTML = '';
+            tabContentsContainer.innerHTML = '';
+
+            grades.forEach((grade, index) => {
+                createGradeTab(grade, index);
+            });
+
+            if (grades.length > 0) {
+                // Activate the first tab by default
+                const firstTab = gradeTabsContainer.querySelector('.tab');
+                const firstContent = tabContentsContainer.querySelector('.tab-content');
+                if (firstTab && firstContent) {
+                    firstTab.classList.add('active');
+                    firstContent.classList.add('active');
                 }
-                return result;
             }
+        }
 
-            /**
-             * Retrieves all existing IDs (grades and classes) to ensure uniqueness.
-             * @returns {Set<string>} - A set of all existing IDs.
-             */
-            function getAllExistingIds() {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const ids = new Set();
-                grades.forEach(grade => {
-                    ids.add(grade.id);
-                    grade.classes.forEach(cls => ids.add(cls.id));
-                });
-                return ids;
-            }
-
-            /**
-             * Generates a unique random ID that doesn't exist in the current data.
-             * @param {number} length - The length of the ID.
-             * @returns {string} - A unique ID.
-             */
-            function generateUniqueId(length = 8) {
-                const existingIds = getAllExistingIds();
-                let id;
-                do {
-                    id = generateRandomId(length);
-                } while (existingIds.has(id));
-                return id;
-            }
-
-            /**
-             * Loads grades from local storage and renders the tabs and contents.
-             */
-            function loadGrades() {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                gradeTabsContainer.innerHTML = '';
-                tabContentsContainer.innerHTML = '';
-
-                grades.forEach((grade, index) => {
-                    createGradeTab(grade, index);
-                });
-
-                if (grades.length > 0) {
-                    // Activate the first tab by default
-                    const firstTab = gradeTabsContainer.querySelector('.tab');
-                    const firstContent = tabContentsContainer.querySelector('.tab-content');
-                    if (firstTab && firstContent) {
-                        firstTab.classList.add('active');
-                        firstContent.classList.add('active');
-                    }
-                }
-            }
-
-            /**
-             * Creates a grade tab and its corresponding content area.
-             * @param {Object} grade - The grade object.
-             * @param {number} index - The index of the grade.
-             */
-            function createGradeTab(grade, index) {
-                // Create the tab element
-                const gradeTab = document.createElement('div');
-                gradeTab.classList.add('tab');
-                gradeTab.dataset.target = `grade-content-${grade.id}`;
-                gradeTab.dataset.id = grade.id;
-                gradeTab.innerHTML = `
-                    <span class="non-editable">${grade.id} - </span>
+        /**
+         * Creates a grade tab and its corresponding content area.
+         * @param {Object} grade - The grade object.
+         * @param {number} index - The index of the grade.
+         */
+        function createGradeTab(grade, index) {
+            // Create the tab element
+            const gradeTab = document.createElement('div');
+            gradeTab.classList.add('tab');
+            gradeTab.dataset.target = `grade-content-${grade.id}`;
+            gradeTab.dataset.id = grade.id;
+            gradeTab.innerHTML = `
+                    <span class="non-editable" style="display:none;">${grade.id} - </span>
                     <span class="editable" contenteditable="false">${grade.name}</span>
                 `;
 
-                // Event listener for activating the tab
-                gradeTab.addEventListener('click', function () {
-                    // Deactivate all tabs and contents
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Event listener for activating the tab
+            gradeTab.addEventListener('click', function () {
+                // Deactivate all tabs and contents
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-                    // Activate the clicked tab and its content
-                    this.classList.add('active');
-                    document.getElementById(this.dataset.target).classList.add('active');
-                });
+                // Activate the clicked tab and its content
+                this.classList.add('active');
+                document.getElementById(this.dataset.target).classList.add('active');
+            });
 
-                // Event listener for editing the grade name
-                gradeTab.addEventListener('dblclick', function () {
-                    const editableSpan = this.querySelector('.editable');
-                    editableSpan.contentEditable = true;
-                    editableSpan.focus();
-                });
+            // Event listener for editing the grade name
+            gradeTab.addEventListener('dblclick', function () {
+                const editableSpan = this.querySelector('.editable');
+                editableSpan.contentEditable = true;
+                editableSpan.focus();
+            });
 
-                // Save the edited grade name on blur
-                gradeTab.querySelector('.editable').addEventListener('blur', function () {
-                    const newName = this.innerText.trim();
-                    if (newName === '') {
-                        alert('Grade name cannot be empty.');
-                        this.innerText = getGradeNameById(grade.id);
-                        this.contentEditable = false;
-                        return;
-                    }
-                    updateGradeName(grade.id, newName);
+            // Save the edited grade name on blur
+            gradeTab.querySelector('.editable').addEventListener('blur', function () {
+                const newName = this.innerText.trim();
+                if (newName === '') {
+                    alert('Grade name cannot be empty.');
+                    this.innerText = getGradeNameById(grade.id);
                     this.contentEditable = false;
-                });
-
-                // Append the tab to the container
-                gradeTabsContainer.appendChild(gradeTab);
-
-                // Create the content area for the grade
-                const tabContent = document.createElement('div');
-                tabContent.id = `grade-content-${grade.id}`;
-                tabContent.classList.add('tab-content');
-
-                // Create the class grid inside the content area
-                const classGrid = document.createElement('div');
-                classGrid.classList.add('class-grid');
-                classGrid.id = `class-grid-${grade.id}`;
-
-                // Append the class grid to the content area
-                tabContent.appendChild(classGrid);
-
-                // Append the content area to the container
-                tabContentsContainer.appendChild(tabContent);
-
-                // Load classes for this grade
-                loadClasses(grade.id);
-            }
-
-            /**
-             * Retrieves the grade name by its ID.
-             * @param {string} gradeId - The ID of the grade.
-             * @returns {string} - The name of the grade.
-             */
-            function getGradeNameById(gradeId) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const grade = grades.find(g => g.id === gradeId);
-                return grade ? grade.name : '';
-            }
-
-            /**
-             * Updates the name of a grade and saves it to local storage.
-             * @param {string} gradeId - The ID of the grade.
-             * @param {string} newName - The new name for the grade.
-             */
-            function updateGradeName(gradeId, newName) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const gradeIndex = grades.findIndex(g => g.id === gradeId);
-                if (gradeIndex !== -1) {
-                    grades[gradeIndex].name = newName;
-                    localStorage.setItem('grades', JSON.stringify(grades));
-                    loadGrades(); // Reload to reflect changes
+                    return;
                 }
+                updateGradeName(grade.id, newName);
+                this.contentEditable = false;
+            });
+
+            // Append the tab to the container
+            gradeTabsContainer.appendChild(gradeTab);
+
+            // Create the content area for the grade
+            const tabContent = document.createElement('div');
+            tabContent.id = `grade-content-${grade.id}`;
+            tabContent.classList.add('tab-content');
+
+            // Create the class grid inside the content area
+            const classGrid = document.createElement('div');
+            classGrid.classList.add('class-grid');
+            classGrid.id = `class-grid-${grade.id}`;
+
+            // Append the class grid to the content area
+            tabContent.appendChild(classGrid);
+
+            // Append the content area to the container
+            tabContentsContainer.appendChild(tabContent);
+
+            // Load classes for this grade
+            loadClasses(grade.id);
+        }
+
+        /**
+         * Retrieves the grade name by its ID.
+         * @param {string} gradeId - The ID of the grade.
+         * @returns {string} - The name of the grade.
+         */
+        function getGradeNameById(gradeId) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const grade = grades.find(g => g.id === gradeId);
+            return grade ? grade.name : '';
+        }
+
+        /**
+         * Updates the name of a grade and saves it to local storage.
+         * @param {string} gradeId - The ID of the grade.
+         * @param {string} newName - The new name for the grade.
+         */
+        function updateGradeName(gradeId, newName) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const gradeIndex = grades.findIndex(g => g.id === gradeId);
+            if (gradeIndex !== -1) {
+                grades[gradeIndex].name = newName;
+                localStorage.setItem('grades', JSON.stringify(grades));
+                loadGrades(); // Reload to reflect changes
             }
+        }
 
-            /**
-             * Loads classes for a specific grade and renders them.
-             * @param {string} gradeId - The ID of the grade.
-             */
-            function loadClasses(gradeId) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const grade = grades.find(g => g.id === gradeId);
-                if (!grade) return;
+        /**
+         * Loads classes for a specific grade and renders them.
+         * @param {string} gradeId - The ID of the grade.
+         */
+        function loadClasses(gradeId) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const grade = grades.find(g => g.id === gradeId);
+            if (!grade) return;
 
-                const classGrid = document.getElementById(`class-grid-${gradeId}`);
-                classGrid.innerHTML = ''; // Clear existing classes
+            const classGrid = document.getElementById(`class-grid-${gradeId}`);
+            classGrid.innerHTML = ''; // Clear existing classes
 
-                grade.classes.forEach(cls => {
-                    createClassCard(cls, gradeId);
-                });
+            grade.classes.forEach(cls => {
+                createClassCard(cls, gradeId);
+            });
 
-                // Add the "Add Class" button
-                const addClassCard = document.createElement('button');
-                addClassCard.classList.add('class-card', 'add-class');
-                addClassCard.innerText = "+ Add Class";
-                addClassCard.addEventListener('click', () => {
-                    const newClassName = prompt("Enter new class name:");
-                    if (newClassName && newClassName.trim() !== '') {
-                        addNewClass(gradeId, newClassName.trim());
-                    } else if (newClassName !== null) { // Allow cancel without action
-                        alert("Class name cannot be empty.");
-                    }
-                });
-                classGrid.appendChild(addClassCard);
-            }
+            // Add the "Add Class" button
+            const addClassCard = document.createElement('button');
+            addClassCard.classList.add('class-card', 'add-class');
+            addClassCard.innerText = "+ Add Class";
+            addClassCard.addEventListener('click', () => {
+                const newClassName = prompt("Enter new class name:");
+                if (newClassName && newClassName.trim() !== '') {
+                    addNewClass(gradeId, newClassName.trim());
+                } else if (newClassName !== null) { // Allow cancel without action
+                    alert("Class name cannot be empty.");
+                }
+            });
+            classGrid.appendChild(addClassCard);
+        }
 
-            /**
-             * Creates a class card and appends it to the class grid.
-             * @param {Object} cls - The class object.
-             * @param {string} gradeId - The ID of the grade to which the class belongs.
-             */
-            function createClassCard(cls, gradeId) {
-                const classGrid = document.getElementById(`class-grid-${gradeId}`);
+        /**
+         * Creates a class card and appends it to the class grid.
+         * @param {Object} cls - The class object.
+         * @param {string} gradeId - The ID of the grade to which the class belongs.
+         */
+        function createClassCard(cls, gradeId) {
+            const classGrid = document.getElementById(`class-grid-${gradeId}`);
 
-                const classCard = document.createElement('div');
-                classCard.classList.add('class-card');
-                classCard.dataset.id = cls.id;
-                classCard.innerHTML = `
-                    <span class="non-editable">${cls.id} - </span>
-                    <span class="editable" contenteditable="false">${cls.name}</span>
+            const classCard = document.createElement('div');
+            classCard.classList.add('class-card');
+            classCard.dataset.id = cls.id;
+            classCard.innerHTML = `
+                    <span class="non-editable" style="font-size:8px;display:none;">${cls.id} - </span>
+                    <span class="editable" contenteditable="false" style="color:#000;">${cls.name}</span>
                 `;
 
-                // Event listener for editing the class name
-                classCard.addEventListener('dblclick', function () {
-                    const editableSpan = this.querySelector('.editable');
-                    editableSpan.contentEditable = true;
-                    editableSpan.focus();
-                });
+            // Event listener for editing the class name
+            classCard.addEventListener('dblclick', function () {
+                const editableSpan = this.querySelector('.editable');
+                editableSpan.contentEditable = true;
+                editableSpan.focus();
+            });
 
-                // Save the edited class name on blur
-                classCard.querySelector('.editable').addEventListener('blur', function () {
-                    const newName = this.innerText.trim();
-                    if (newName === '') {
-                        alert('Class name cannot be empty.');
-                        this.innerText = getClassNameById(gradeId, cls.id);
-                        this.contentEditable = false;
-                        return;
-                    }
-                    updateClassName(gradeId, cls.id, newName);
+            // Save the edited class name on blur
+            classCard.querySelector('.editable').addEventListener('blur', function () {
+                const newName = this.innerText.trim();
+                if (newName === '') {
+                    alert('Class name cannot be empty.');
+                    this.innerText = getClassNameById(gradeId, cls.id);
                     this.contentEditable = false;
-                });
-
-                // Append the class card before the "Add Class" button
-                classGrid.insertBefore(classCard, classGrid.querySelector('.add-class'));
-            }
-
-            /**
-             * Retrieves the class name by grade ID and class ID.
-             * @param {string} gradeId - The ID of the grade.
-             * @param {string} classId - The ID of the class.
-             * @returns {string} - The name of the class.
-             */
-            function getClassNameById(gradeId, classId) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const grade = grades.find(g => g.id === gradeId);
-                if (!grade) return '';
-                const cls = grade.classes.find(c => c.id === classId);
-                return cls ? cls.name : '';
-            }
-
-            /**
-             * Updates the name of a class and saves it to local storage.
-             * @param {string} gradeId - The ID of the grade.
-             * @param {string} classId - The ID of the class.
-             * @param {string} newName - The new name for the class.
-             */
-            function updateClassName(gradeId, classId, newName) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const gradeIndex = grades.findIndex(g => g.id === gradeId);
-                if (gradeIndex === -1) return;
-                const classIndex = grades[gradeIndex].classes.findIndex(c => c.id === classId);
-                if (classIndex === -1) return;
-
-                grades[gradeIndex].classes[classIndex].name = newName;
-                localStorage.setItem('grades', JSON.stringify(grades));
-                loadGrades(); // Reload to reflect changes
-            }
-
-            /**
-             * Adds a new class to a specific grade.
-             * @param {string} gradeId - The ID of the grade.
-             * @param {string} className - The name of the new class.
-             */
-            function addNewClass(gradeId, className) {
-                const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                const gradeIndex = grades.findIndex(g => g.id === gradeId);
-                if (gradeIndex === -1) return;
-
-                const newClassId = generateUniqueId(8);
-                grades[gradeIndex].classes.push({ id: newClassId, name: className });
-                localStorage.setItem('grades', JSON.stringify(grades));
-                loadGrades(); // Reload to reflect changes
-            }
-
-            /**
-             * Adds a new grade.
-             */
-            function addNewGrade() {
-                const newGradeName = prompt("Enter new grade name:");
-                if (newGradeName && newGradeName.trim() !== '') {
-                    const grades = JSON.parse(localStorage.getItem('grades')) || [];
-                    const newGradeId = generateUniqueId(8);
-                    grades.push({ id: newGradeId, name: newGradeName.trim(), classes: [] });
-                    localStorage.setItem('grades', JSON.stringify(grades));
-                    loadGrades(); // Reload to reflect changes
-                } else if (newGradeName !== null) { // Allow cancel without action
-                    alert("Grade name cannot be empty.");
+                    return;
                 }
+                updateClassName(gradeId, cls.id, newName);
+                this.contentEditable = false;
+            });
+
+            // Append the class card before the "Add Class" button
+            classGrid.insertBefore(classCard, classGrid.querySelector('.add-class'));
+        }
+
+        /**
+         * Retrieves the class name by grade ID and class ID.
+         * @param {string} gradeId - The ID of the grade.
+         * @param {string} classId - The ID of the class.
+         * @returns {string} - The name of the class.
+         */
+        function getClassNameById(gradeId, classId) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const grade = grades.find(g => g.id === gradeId);
+            if (!grade) return '';
+            const cls = grade.classes.find(c => c.id === classId);
+            return cls ? cls.name : '';
+        }
+
+        /**
+         * Updates the name of a class and saves it to local storage.
+         * @param {string} gradeId - The ID of the grade.
+         * @param {string} classId - The ID of the class.
+         * @param {string} newName - The new name for the class.
+         */
+        function updateClassName(gradeId, classId, newName) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const gradeIndex = grades.findIndex(g => g.id === gradeId);
+            if (gradeIndex === -1) return;
+            const classIndex = grades[gradeIndex].classes.findIndex(c => c.id === classId);
+            if (classIndex === -1) return;
+
+            grades[gradeIndex].classes[classIndex].name = newName;
+            localStorage.setItem('grades', JSON.stringify(grades));
+            loadGrades(); // Reload to reflect changes
+        }
+
+        /**
+         * Adds a new class to a specific grade.
+         * @param {string} gradeId - The ID of the grade.
+         * @param {string} className - The name of the new class.
+         */
+        function addNewClass(gradeId, className) {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const gradeIndex = grades.findIndex(g => g.id === gradeId);
+            if (gradeIndex === -1) return;
+
+            const newClassId = generateUniqueId(8);
+            grades[gradeIndex].classes.push({ id: newClassId, name: className });
+            localStorage.setItem('grades', JSON.stringify(grades));
+            loadGrades(); // Reload to reflect changes
+        }
+
+        /**
+         * Adds a new grade.
+         */
+        function addNewGrade() {
+            const newGradeName = prompt("Enter new grade name:");
+            if (newGradeName && newGradeName.trim() !== '') {
+                const grades = JSON.parse(localStorage.getItem('grades')) || [];
+                const newGradeId = generateUniqueId(8);
+                grades.push({ id: newGradeId, name: newGradeName.trim(), classes: [] });
+                localStorage.setItem('grades', JSON.stringify(grades));
+                loadGrades(); // Reload to reflect changes
+            } else if (newGradeName !== null) { // Allow cancel without action
+                alert("Grade name cannot be empty.");
             }
+        }
 
-            // Event listener for adding a new grade
-            addGradeButton.addEventListener('click', addNewGrade);
+        // Event listener for adding a new grade
+        addGradeButton.addEventListener('click', addNewGrade);
 
-            // Initial load of grades and classes
-            loadGrades();
-        })();
-    </script>
-</body>
-</html>
+        // Initial load of grades and classes
+        loadGrades();
+    })();
+</script>

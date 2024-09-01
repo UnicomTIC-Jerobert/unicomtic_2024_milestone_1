@@ -1,0 +1,60 @@
+[
+    {
+        "id": "GRADE_1",
+        "name": "Grade 1",
+        "classes": [
+            {
+                "id": "h9jcPQN3",
+                "name": "Apple"
+            },
+            {
+                "id": "lFxQkg7k",
+                "name": "Banana"
+            }
+        ]
+    },
+    {
+        "id": "GRADE_2",
+        "name": "Grade 2",
+        "classes": []
+    },
+    {
+        "id": "GRADE_3",
+        "name": "Grade 3",
+        "classes": [
+            {
+                "id": "CLASS_1",
+                "name": "Alfred"
+            },
+            {
+                "id": "CLASS_2",
+                "name": "Bonito"
+            }
+        ]
+    },
+    {
+        "id": "GRADE_4",
+        "name": "Grade 4",
+        "classes": []
+    },
+    {
+        "id": "GRADE_5",
+        "name": "Grade Five",
+        "classes": []
+    },
+    {
+        "id": "GRADE_6",
+        "name": "Grade 6",
+        "classes": []
+    },
+    {
+        "id": "YriZgyQj",
+        "name": "Grade 7",
+        "classes": [
+            {
+                "id": "hXF1Zk2b",
+                "name": "ABC"
+            }
+        ]
+    }
+]
