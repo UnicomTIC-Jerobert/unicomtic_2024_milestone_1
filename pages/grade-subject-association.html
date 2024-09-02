@@ -1,0 +1,231 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .subject-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .subject-list li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .subject-list li span {
+        margin-right: 10px;
+    }
+
+    .subject-list li button {
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .dropdown {
+        margin-bottom: 20px;
+    }
+
+    .basket-group {
+        margin-top: 20px;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+    }
+</style>
+
+<div id="subject-management">
+    <select id="grade-select">
+        <option value="" disabled selected>Select a Grade</option>
+    </select>
+
+    <!-- Mandatory Subjects Section -->
+    <h3>Mandatory Subjects</h3>
+    <ul id="mandatory-subject-list"></ul>
+    <input type="text" id="mandatory-subject-input" placeholder="Add Mandatory Subject">
+    <button id="add-mandatory-subject">Add Mandatory Subject</button>
+
+    <!-- Basket Creation Section -->
+    <h3>Baskets</h3>
+    <button id="create-basket">Create New Basket</button>
+    <div id="baskets-container"></div>
+
+    <button id="save-subjects">Save Subjects</button>
+</div>
+
+<script>
+    (function () {
+        const gradeSelect = document.getElementById('grade-select');
+        const mandatorySubjectList = document.getElementById('mandatory-subject-list');
+        const mandatorySubjectInput = document.getElementById('mandatory-subject-input');
+        const addMandatorySubjectButton = document.getElementById('add-mandatory-subject');
+        const basketsContainer = document.getElementById('baskets-container');
+        const createBasketButton = document.getElementById('create-basket');
+        const saveSubjectsButton = document.getElementById('save-subjects');
+
+        let selectedGrade = null;
+        let mandatorySubjects = [];
+        let baskets = [];
+
+        // Load grades from localStorage into the dropdown
+        function loadGrades() {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            grades.forEach(grade => {
+                const option = document.createElement('option');
+                option.value = grade.id;
+                option.textContent = grade.name;
+                gradeSelect.appendChild(option);
+            });
+        }
+
+        // Function to add mandatory subject
+        addMandatorySubjectButton.addEventListener('click', function () {
+            const subjectName = mandatorySubjectInput.value.trim();
+            if (subjectName !== "") {
+                mandatorySubjects.push(subjectName);
+                const li = document.createElement('li');
+                li.textContent = subjectName;
+                mandatorySubjectList.appendChild(li);
+                mandatorySubjectInput.value = "";
+            }
+        });
+
+        // Function to create a new basket
+        createBasketButton.addEventListener('click', function () {
+            const basket = {
+                id: baskets.length + 1,
+                subjects: []
+            };
+            baskets.push(basket);
+
+            const basketDiv = document.createElement('div');
+            basketDiv.classList.add('basket');
+            basketDiv.dataset.basketId = basket.id;
+
+            const basketTitle = document.createElement('h4');
+            basketTitle.textContent = `Basket ${basket.id}`;
+            basketDiv.appendChild(basketTitle);
+
+            const subjectInput = document.createElement('input');
+            subjectInput.type = 'text';
+            subjectInput.placeholder = 'Add Subject to Basket';
+            basketDiv.appendChild(subjectInput);
+
+            const addButton = document.createElement('button');
+            addButton.textContent = 'Add Subject';
+            addButton.addEventListener('click', function () {
+                const subjectName = subjectInput.value.trim();
+                if (subjectName !== "") {
+                    basket.subjects.push(subjectName);
+                    const li = document.createElement('li');
+                    li.textContent = subjectName;
+                    basketDiv.querySelector('ul').appendChild(li);
+                    subjectInput.value = "";
+                }
+            });
+            basketDiv.appendChild(addButton);
+
+            const subjectList = document.createElement('ul');
+            basketDiv.appendChild(subjectList);
+
+            basketsContainer.appendChild(basketDiv);
+        });
+
+        // Save subjects to localStorage
+        saveSubjectsButton.addEventListener('click', function () {
+            if (selectedGrade) {
+                const gradeData = JSON.parse(localStorage.getItem('gradesData')) || {};
+                gradeData[selectedGrade] = {
+                    mandatorySubjects: mandatorySubjects,
+                    baskets: baskets
+                };
+                localStorage.setItem('gradesData', JSON.stringify(gradeData));
+                alert('Subjects saved successfully!');
+            }
+        });
+
+        gradeSelect.addEventListener('change', function () {
+            selectedGrade = gradeSelect.value;
+            loadGradeData(selectedGrade);
+        });
+
+        function loadGradeData(gradeId) {
+            mandatorySubjects = [];
+            baskets = [];
+            mandatorySubjectList.innerHTML = "";
+            basketsContainer.innerHTML = "";
+
+            const gradeData = JSON.parse(localStorage.getItem('gradesData')) || {};
+            if (gradeData[gradeId]) {
+                mandatorySubjects = gradeData[gradeId].mandatorySubjects || [];
+                baskets = gradeData[gradeId].baskets || [];
+
+                mandatorySubjects.forEach(subject => {
+                    const li = document.createElement('li');
+                    li.textContent = subject;
+                    mandatorySubjectList.appendChild(li);
+                });
+
+                baskets.forEach(basket => {
+                    const basketDiv = document.createElement('div');
+                    basketDiv.classList.add('basket');
+                    basketDiv.dataset.basketId = basket.id;
+
+                    const basketTitle = document.createElement('h4');
+                    basketTitle.textContent = `Basket ${basket.id}`;
+                    basketDiv.appendChild(basketTitle);
+
+                    const subjectInput = document.createElement('input');
+                    subjectInput.type = 'text';
+                    subjectInput.placeholder = 'Add Subject to Basket';
+                    basketDiv.appendChild(subjectInput);
+
+                    const addButton = document.createElement('button');
+                    addButton.textContent = 'Add Subject';
+                    addButton.addEventListener('click', function () {
+                        const subjectName = subjectInput.value.trim();
+                        if (subjectName !== "") {
+                            basket.subjects.push(subjectName);
+                            const li = document.createElement('li');
+                            li.textContent = subjectName;
+                            basketDiv.querySelector('ul').appendChild(li);
+                            subjectInput.value = "";
+                        }
+                    });
+                    basketDiv.appendChild(addButton);
+
+                    const subjectList = document.createElement('ul');
+                    basket.subjects.forEach(subject => {
+                        const li = document.createElement('li');
+                        li.textContent = subject;
+                        subjectList.appendChild(li);
+                    });
+                    basketDiv.appendChild(subjectList);
+
+                    basketsContainer.appendChild(basketDiv);
+                });
+            }
+        }
+
+        loadGrades();
+    })();
+
+</script>
