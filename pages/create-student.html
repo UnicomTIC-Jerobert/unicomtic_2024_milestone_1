@@ -1,0 +1,273 @@
+<style>
+    .create-student-container {
+        width: 1000px;
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    /* Add your CSS styling here */
+    #createStudentForm .flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #profilePreview {
+        width: 250px !important;
+        height: 250px !important;
+    }
+
+    .error {
+        color: red;
+        display: none;
+    }
+
+    .contact-container,
+    .address-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .contact-item,
+    .address-item {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    .contact-item input,
+    .address-item input {
+        flex: 1;
+    }
+
+    .add-more-button {
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+    }
+
+    .add-more-button:hover {
+        background-color: #16a085;
+    }
+</style>
+
+<div class="create-student-container">
+    <h1>Create Student</h1>
+    <form id="createStudentForm">
+        <div class="flex-container">
+            <div style="width:300px;">
+                <div>
+                    <label for="profilePictureFile">Profile Picture:</label>
+                    <input type="file" id="profilePictureFile" name="profilePicture" accept="image/*">
+                    <img id="profilePreview" src="./default-profile.png" alt="Profile Preview">
+                </div>
+
+                <div>
+                    <label for="studentId">Student ID:</label>
+                    <input type="text" id="studentId" name="studentId" required>
+                    <div id="studentIdError" class="error">Student ID is required.</div>
+
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                    <div id="firstNameError" class="error">First Name is required.</div>
+
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                    <div id="lastNameError" class="error">Last Name is required.</div>
+
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                    <div id="dobError" class="error">Date of Birth is required.</div>
+
+                    <label for="doj">Date of Join:</label>
+                    <input type="date" id="doj" name="doj" required>
+                    <div id="dojError" class="error">Date of Join is required.</div>
+                </div>
+            </div>
+
+            <div style="width:200px;">
+                <div>
+                    <label for="contactNumbers">Contact Numbers:</label>
+                    <div id="contactContainer" class="contact-container">
+                        <div class="contact-item">
+                            <input type="text" class="contact-number" placeholder="Enter contact number">
+                        </div>
+                    </div>
+                    <button type="button" class="add-more-button" id="addContactButton">+</button>
+                </div>
+            </div>
+            <div style="width:400px;">
+                <div>
+                    <label for="addresses">Addresses:</label>
+                    <div id="addressContainer" class="address-container">
+                        <div class="address-item">
+                            <input type="text" class="address" placeholder="Enter address">
+                        </div>
+                    </div>
+                    <button type="button" class="add-more-button" id="addAddressButton">+</button>
+                </div>
+            </div>
+        </div>
+        <button type="submit">Create Student</button>
+    </form>
+</div>
+
+<script>
+    function initializeCreateStudent() {
+        const form = document.getElementById('createStudentForm');
+
+        if (!form) {
+            console.error('Form element not found!');
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            createStudent();
+        });
+
+        const profilePictureInput = document.getElementById('profilePictureFile');
+        const profilePreview = document.getElementById('profilePreview');
+
+        profilePictureInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profilePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                profilePreview.src = './default-profile.png'; // Default image if no file is selected
+            }
+        });
+
+        document.getElementById('addContactButton').addEventListener('click', function () {
+            addContactField();
+        });
+
+        document.getElementById('addAddressButton').addEventListener('click', function () {
+            addAddressField();
+        });
+
+        function addContactField() {
+            const contactContainer = document.getElementById('contactContainer');
+            const newContactItem = document.createElement('div');
+            newContactItem.className = 'contact-item';
+            newContactItem.innerHTML = `<input type="text" class="contact-number" placeholder="Enter contact number">`;
+            contactContainer.appendChild(newContactItem);
+        }
+
+        function addAddressField() {
+            const addressContainer = document.getElementById('addressContainer');
+            const newAddressItem = document.createElement('div');
+            newAddressItem.className = 'address-item';
+            newAddressItem.innerHTML = `<input type="text" class="address" placeholder="Enter address">`;
+            addressContainer.appendChild(newAddressItem);
+        }
+
+        function createStudent() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const dob = document.getElementById('dob').value.trim();
+            const doj = document.getElementById('doj').value.trim();
+            const contactNumbers = Array.from(document.querySelectorAll('.contact-number')).map(input => input.value.trim()).filter(value => value);
+            const addresses = Array.from(document.querySelectorAll('.address')).map(input => input.value.trim()).filter(value => value);
+            const profilePicture = document.getElementById('profilePictureFile').files[0];
+
+            if (!validateStudent(studentId, firstName, lastName, dob, doj)) return;
+
+            const student = {
+                id: studentId,
+                firstName,
+                lastName,
+                dob,
+                doj,
+                contactNumbers,
+                addresses
+            };
+
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            students.push(student);
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userPhoto = JSON.parse(localStorage.getItem('user_photo') || '{}');
+
+            const user = {
+                username: studentId,
+                password: 'pwd123',
+                firstName,
+                lastName,
+                role: 'Student'
+            };
+
+            users.push(user);
+
+            if (profilePicture) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    userPhoto[studentId] = e.target.result;
+                    localStorage.setItem('user_photo', JSON.stringify(userPhoto));
+                };
+                reader.readAsDataURL(profilePicture);
+            }
+
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert('Student created successfully.');
+            form.reset();
+            profilePreview.src = './default-profile.png'; // Reset to default image
+        }
+
+        function validateStudent(studentId, firstName, lastName, dob, doj) {
+            let valid = true;
+
+            if (studentId === '') {
+                document.getElementById('studentIdError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('studentIdError').style.display = 'none';
+            }
+
+            if (firstName === '') {
+                document.getElementById('firstNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('firstNameError').style.display = 'none';
+            }
+
+            if (lastName === '') {
+                document.getElementById('lastNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('lastNameError').style.display = 'none';
+            }
+
+            if (dob === '') {
+                document.getElementById('dobError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('dobError').style.display = 'none';
+            }
+
+            if (doj === '') {
+                document.getElementById('dojError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('dojError').style.display = 'none';
+            }
+
+            return valid;
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCreateStudent);
+    } else {
+        initializeCreateStudent();
+    }
+</script>

@@ -20,7 +20,6 @@
                 <th>Last Name</th>
                 <th>NIC Number</th>
                 <th>Date Of Birth</th>
-                <th>Assigned Class</th>
             </tr>
         </thead>
         <tbody>
@@ -60,10 +59,6 @@
                 const dobCell = document.createElement('td');
                 dobCell.textContent = teacher.dob;
                 row.appendChild(dobCell);
-
-                const assignedClassCell = document.createElement('td');
-                assignedClassCell.textContent = teacher.assignedClass || 'Not Assigned';
-                row.appendChild(assignedClassCell);
 
                 teachersTableBody.appendChild(row);
             });
